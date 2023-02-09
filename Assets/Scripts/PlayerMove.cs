@@ -1,8 +1,10 @@
+using System;
 using UnityEngine;
 
 namespace Scripts
 {
-  [RequireComponent(typeof(CharacterController))]
+    [RequireComponent(typeof(CharacterController))]
+    [RequireComponent(typeof(PlayerAttack))]
     public class PlayerMove : MonoBehaviour
     {
         public bool IsPlayerJump => _isPlayerJump;
@@ -20,18 +22,28 @@ namespace Scripts
         [SerializeField] private Animator _playerAnimator;
 
         private CharacterController _characterController;
+        private PlayerAttack _playerAttack;
         private float _verticalInput;
         private float _jumpSpeed;
         private bool _isPlayerJump;
         private float _speedLerp;
-
+        private Vector3 _dir;
 
         private Vector3 _playerLookPoint;
 
         private void Start()
         {
-            _characterController = GetComponent<CharacterController>();
+            TryGetComponent(out _characterController);
+
+            TryGetComponent(out _playerAttack);
+            _playerAttack.OnPlayerAttackEvent += StopMove;
         }
+
+        private void StopMove() 
+        {
+            _verticalInput = 0f;
+            _speedLerp = 0f;
+        }  
 
         private void Update()
         {
@@ -58,13 +70,13 @@ namespace Scripts
         {
             _jumpSpeed += _gravity * Time.fixedDeltaTime;
 
-            Vector3 dir = transform.forward * _speedLerp * _moveSpeed * Time.fixedDeltaTime;
+            _dir = transform.forward * _speedLerp * _moveSpeed * Time.fixedDeltaTime;
 
-            dir = new Vector3(dir.x, _jumpSpeed * Time.fixedDeltaTime, dir.z);
+            _dir = new Vector3(_dir.x, _jumpSpeed * Time.fixedDeltaTime, _dir.z);
 
-            _characterController.Move(dir); // player move forward fith gravity
+            _characterController.Move(_dir); // player move forward fith gravity
 
-            // Debug.DrawRay(transform.position, new Vector3(dir.x, 0f, dir.z) * 10f, Color.red);
+            // Debug.DrawRay(transform.position, new Vector3(_dir.x, 0f, _dir.z) * 10f, Color.red);
 
             var speed = _characterController.velocity.magnitude * _speedLerp;
             

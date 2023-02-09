@@ -1,9 +1,12 @@
+using System;
 using UnityEngine;
 
 namespace Scripts
 {
   public class PlayerAttack : MonoBehaviour
   {
+    public event Action OnPlayerAttackEvent;
+
     private const string AttackHand = "DoAttack1";
     private const string AttackFoot = "DoAttack2";
 
@@ -13,7 +16,7 @@ namespace Scripts
 
     private void Start()
     {
-        TryGetComponent<PlayerMove>(out _playerMove);
+        TryGetComponent(out _playerMove);
     }
 
     private void Update()
@@ -23,11 +26,13 @@ namespace Scripts
       if (Input.GetMouseButtonDown(0))
       {
         _playerAnimator.SetTrigger(AttackHand);
+        OnPlayerAttackEvent?.Invoke();
       }
 
       if (Input.GetMouseButtonDown(1))
       {
         _playerAnimator.SetTrigger(AttackFoot);
+        OnPlayerAttackEvent?.Invoke();
       }
     }
   }
