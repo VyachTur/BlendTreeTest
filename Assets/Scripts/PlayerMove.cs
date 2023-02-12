@@ -29,8 +29,6 @@ namespace Scripts
         private float _speedLerp;
         private Vector3 _dir;
 
-        private Vector3 _playerLookPoint;
-
         private void Start()
         {
             TryGetComponent(out _characterController);
